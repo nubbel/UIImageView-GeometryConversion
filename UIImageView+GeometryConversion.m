@@ -4,6 +4,11 @@
 //  Created by Dominique d'Argent on 18.04.12.
 //  Copyright (c) 2012. All rights reserved.
 //
+//  Thomas Sarlandie - 2012:
+//  - Added convertPointFromView:viewPoint
+//  - Added convertRectFromView:viewPoint
+//
+//  Contribution released in the public domain.
 
 #import "UIImageView+GeometryConversion.h"
 
@@ -136,6 +141,136 @@
                                  ABS(viewBottomRight.y - viewTopLeft.y));
     
     return viewRect;
+}
+
+- (CGPoint)convertPointFromView:(CGPoint)viewPoint {
+    CGPoint imagePoint = viewPoint;
+    
+    CGSize imageSize = self.image.size;
+    CGSize viewSize  = self.bounds.size;
+    
+    CGFloat ratioX = viewSize.width / imageSize.width;
+    CGFloat ratioY = viewSize.height / imageSize.height;
+    
+    UIViewContentMode contentMode = self.contentMode;
+    
+    switch (contentMode) {
+        case UIViewContentModeScaleToFill:
+        case UIViewContentModeRedraw:
+        {
+            imagePoint.x /= ratioX;
+            imagePoint.y /= ratioY;
+            break;
+        }
+            
+        case UIViewContentModeScaleAspectFit:
+        case UIViewContentModeScaleAspectFill:
+        {
+            CGFloat scale;
+            
+            if (contentMode == UIViewContentModeScaleAspectFit) {
+                scale = MIN(ratioX, ratioY);
+            }
+            else /*if (contentMode == UIViewContentModeScaleAspectFill)*/ {
+                scale = MAX(ratioX, ratioY);
+            }
+            
+            // Remove the x or y margin added in FitMode
+            imagePoint.x -= (viewSize.width  - imageSize.width  * scale) / 2.0f;
+            imagePoint.y -= (viewSize.height - imageSize.height * scale) / 2.0f;
+
+            imagePoint.x /= scale;
+            imagePoint.y /= scale;
+
+            break;
+        }
+            
+        case UIViewContentModeCenter:
+        {
+            imagePoint.x -= (viewSize.width - imageSize.width)  / 2.0f;
+            imagePoint.y -= (viewSize.height - imageSize.height) / 2.0f;
+            
+            break;
+        }
+            
+        case UIViewContentModeTop:
+        {
+            imagePoint.x -= (viewSize.width - imageSize.width)  / 2.0f;
+            
+            break;
+        }
+            
+        case UIViewContentModeBottom:
+        {
+            imagePoint.x -= (viewSize.width - imageSize.width)  / 2.0f;
+            imagePoint.y -= (viewSize.height - imageSize.height);
+            
+            break;
+        }
+            
+        case UIViewContentModeLeft:
+        {
+            imagePoint.y -= (viewSize.height - imageSize.height) / 2.0f;
+            
+            break;
+        }
+            
+        case UIViewContentModeRight:
+        {
+            imagePoint.x -= (viewSize.width - imageSize.width);
+            imagePoint.y -= (viewSize.height - imageSize.height) / 2.0f;
+
+            break;
+        }
+            
+        case UIViewContentModeTopRight:
+        {
+            imagePoint.x -= (viewSize.width - imageSize.width);
+            
+            break;
+        }
+            
+            
+        case UIViewContentModeBottomLeft:
+        {
+            imagePoint.y -= (viewSize.height - imageSize.height);
+            
+            break;
+        }
+            
+            
+        case UIViewContentModeBottomRight:
+        {
+            imagePoint.x -= (viewSize.width - imageSize.width);
+            imagePoint.y -= (viewSize.height - imageSize.height);
+            
+            break;
+        }
+            
+        case UIViewContentModeTopLeft:
+        default:
+        {
+            break;
+        }
+    }
+    
+    return imagePoint;
+}
+
+- (CGRect)convertRectFromView:(CGRect)viewRect {
+    CGPoint viewTopLeft = viewRect.origin;
+    CGPoint viewBottomRight = CGPointMake(CGRectGetMaxX(viewRect), 
+                                          CGRectGetMaxY(viewRect));
+    
+    CGPoint imageTopLeft = [self convertPointFromView:viewTopLeft];
+    CGPoint imageBottomRight = [self convertPointFromView:viewBottomRight];
+    
+    CGRect imageRect;
+    imageRect.origin = imageTopLeft;
+    imageRect.size = CGSizeMake(ABS(imageBottomRight.x - imageTopLeft.x),
+                                ABS(imageBottomRight.y - imageTopLeft.y));
+    
+    return imageRect;
 }
 
 @end
