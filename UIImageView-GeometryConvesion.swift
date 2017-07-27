@@ -129,7 +129,7 @@ extension UIImageView {
 			break
 		}
 		
-		return viewPoint
+		return imagePoint
 	}
 	
 	func convertRect(fromViewRect viewRect : CGRect) -> CGRect {
