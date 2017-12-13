@@ -136,8 +136,8 @@ extension UIImageView {
 		let viewTopLeft = viewRect.origin
 		let viewBottomRight = CGPoint(x: viewRect.maxX, y: viewRect.maxY)
 		
-		let imageTopLeft = convertPoint(fromImagePoint: viewTopLeft)
-		let imageBottomRight = convertPoint(fromImagePoint: viewBottomRight)
+		let imageTopLeft = convertPoint(fromViewPoint: viewTopLeft)
+		let imageBottomRight = convertPoint(fromViewPoint: viewBottomRight)
 		
 		var imageRect : CGRect = .zero
 		imageRect.origin = imageTopLeft
